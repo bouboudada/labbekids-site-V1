@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LABBE kids - Culture et jeux pour petits curieux. Chansons personnalisées avec Boubou et Dada dans toutes les langues.">
+    <title>LABBE kids - Culture et jeux pour petits curieux</title>
+    
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AXgr9Z0bI9ortde2R_m9GkHIKmLli1-1rvdxV9gL7kYcoT7bQDI0kGqgSigtmurB88Nv0ofjvlSB2XU2&currency=EUR"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fef6fb 0%, #f0f8ff 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #9b59b6 0%, #5dade2 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-image {
+            height: 80px;
+            width: auto;
+            background: white;
+            padding: 8px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .brand-text {
+            color: white;
+        }
+
+        .brand-text h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .brand-text p {
+            font-size: 0.9rem;
+            font-style: italic;
+            opacity: 0.95;
+            margin: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .nav-links a:hover {
+            transform: scale(1.1);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #ffeef8 0%, #e3f2fd 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '🎵';
+            position: absolute;
+            font-size: 8rem;
+            opacity: 0.1;
+            top: 10%;
+            left: 10%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '🎶';
+            position: absolute;
+            font-size: 6rem;
+            opacity: 0.1;
+            bottom: 15%;
+            right: 15%;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #9b59b6;
+            margin-bottom: 1rem;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero .tagline {
+            font-size: 1.5rem;
+            color: #5dade2;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #9b59b6 0%, #5dade2 100%);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.6);
+        }
+
+        section {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: #9b59b6;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #9b59b6, #5dade2);
+            margin: 1rem auto;
+            border-radius: 2px;
+        }
+
+        .characters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .character-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .character-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .character-card h3 {
+            font-size: 2.2rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .character-card.dada h3 {
+            color: #9b59b6;
+        }
+
+        .character-card.boubou h3 {
+            color: #5dade2;
+        }
+
+        .character-illustration {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1rem auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+        }
+
+        .character-card.dada .character-illustration {
+            background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%);
+        }
+
+        .character-card.boubou .character-illustration {
+            background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+        }
+
+        .scarf-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .dada .scarf-badge {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .boubou .scarf-badge {
+            background: #5dade2;
+            color: white;
+        }
+
+        .pricing {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .price-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .price-card:hover {
+            transform: scale(1.05);
+            border-color: #9b59b6;
+        }
+
+        .price-card h3 {
+            font-size: 2rem;
+            color: #9b59b6;
+            margin-bottom: 1rem;
+        }
+
+        .price {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #5dade2;
+            margin: 1.5rem 0;
+        }
+
+        .price-card ul {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .price-card li {
+            padding: 0.7rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1.05rem;
+        }
+
+        .price-card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #5dade2;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .form-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 900px;
+            margin: 2rem auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            color: #9b59b6;
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #9b59b6;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .characters-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        .character-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #5dade2;
+        }
+
+        .add-character-btn {
+            background: #5dade2;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: background 0.3s;
+            font-size: 1.05rem;
+        }
+
+        .add-character-btn:hover {
+            background: #4a9dcc;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #9b59b6 0%, #5dade2 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .payment-option {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .payment-option:hover {
+            border-color: #9b59b6;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-option h3 {
+            color: #9b59b6;
+            margin-bottom: 0.5rem;
+        }
+
+        #paypal-button-container {
+            margin-top: 1rem;
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .order-summary h3 {
+            color: #9b59b6;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #9b59b6;
+            margin-top: 0.5rem;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .pricing {
+                grid-template-columns: 1fr;
+            }
+
+            .logo-image {
+                height: 60px;
+            }
+
+            .brand-text h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <img src="/images/logo.png" alt="LABBE kids Logo" class="logo-image">
+                <div class="brand-text">
+                    <h1>LABBE kids</h1>
+                    <p>Culture et jeux pour petits curieux</p>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#accueil">Accueil</a></li>
+                <li><a href="#personnages">Boubou & Dada</a></li>
+                <li><a href="#tarifs">Tarifs</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#commander">Commander</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="hero" id="accueil">
+        <h1>✨ Bienvenue chez LABBE kids ! ✨</h1>
+        <p class="tagline">Culture et jeux pour petits curieux</p>
+        <p>Découvrez les chansons personnalisées magiques de Boubou et Dada,<br>dans toutes les langues du monde 🌈</p>
+        <button class="cta-button" onclick="document.getElementById('commander').scrollIntoView({behavior: 'smooth'})">
+            Créer ma chanson 🎵
+        </button>
+    </div>
+
+    <section id="personnages">
+        <h2>Rencontrez Boubou et Dada</h2>
+        <p style="text-align: center; font-size: 1.2rem; max-width: 700px; margin: 0 auto 3rem auto; line-height: 1.7;">
+            Nous sommes frère et sœur passionnés par la musique et les chansons rigolotes. 
+            Avec nous, les enfants s'initieront à la musique tout en s'amusant !
+        </p>
+        <div class="characters">
+            <div class="character-card dada">
+                <div class="character-illustration">👧🏻</div>
+                <h3>Dada</h3>
+                <div class="scarf-badge">Écharpe violette 💜</div>
+                <p><strong>5 ans • Yeux verts • Cheveux châtain clair</strong></p>
+                <p style="margin-top: 1rem; line-height: 1.6;">Grande sœur curieuse qui adore découvrir le monde et partager ses aventures en chansons !</p>
+            </div>
+            <div class="character-card boubou">
+                <div class="character-illustration">👦🏼</div>
+                <h3>Boubou</h3>
+                <div class="scarf-badge">Écharpe bleue 💙</div>
+                <p><strong>3 ans • Yeux verts • Cheveux blonds</strong></p>
+                <p style="margin-top: 1rem; line-height: 1.6;">Petit frère joyeux qui suit sa grande sœur partout et transforme chaque moment en mélodie rigolote !</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Pourquoi choisir LABBE kids ?</h2>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3>Multilingue</h3>
+                <p>Chansons dans toutes les langues pour célébrer la diversité culturelle</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>100% Personnalisé</h3>
+                <p>Avec les prénoms, anecdotes et personnages de votre choix</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">❤️</div>
+                <h3>Fait avec amour</h3>
+                <p>Chaque chanson est unique et créée spécialement pour votre enfant</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Livraison rapide</h3>
+                <p>Recevez votre chanson par email en 3-5 jours</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="tarifs">
+        <h2>Nos formules magiques</h2>
+        <div class="pricing">
+            <div class="price-card">
+                <h3>🌟 Découverte</h3>
+                <div class="price">9,90€</div>
+                <ul>
+                    <li>1 à 3 personnages</li>
+                    <li>1 langue</li>
+                    <li>Durée 2-3 minutes</li>
+                    <li>Format MP3</li>
+                    <li>Thème au choix</li>
+                </ul>
+                <button class="cta-button" onclick="selectPlan('découverte')">Choisir</button>
+            </div>
+            <div class="price-card">
+                <h3>⭐ Standard</h3>
+                <div class="price">14,90€</div>
+                <ul>
+                    <li>4 à 6 personnages</li>
+                    <li>1 langue</li>
+                    <li>Durée 2-3 minutes</li>
+                    <li>Format MP3</li>
+                    <li>Anecdotes personnalisées</li>
+                </ul>
+                <button class="cta-button" onclick="selectPlan('standard')">Choisir</button>
+            </div>
+            <div class="price-card">
+                <h3>💎 Premium</h3>
+                <div class="price">19,90€</div>
+                <ul>
+                    <li>7 à 10 personnages</li>
+                    <li>1 langue</li>
+                    <li>Durée 2-3 minutes</li>
+                    <li>Format MP3</li>
+                    <li>Anecdotes détaillées</li>
+                    <li>Style musical spécifique</li>
+                </ul>
+                <button class="cta-button" onclick="selectPlan('premium')">Choisir</button>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2.5rem; font-size: 1.15rem;">
+            <p><strong>Options :</strong> Version instrumentale +3€ • Seconde langue +5€</p>
+        </div>
+    </section>
+
+    <section id="commander">
+        <h2>Créez votre chanson personnalisée</h2>
+        <div class="form-container">
+            <form id="orderForm">
+                <div class="form-group">
+                    <label>Formule choisie *</label>
+                    <select id="plan" name="plan" required>
+                        <option value="">-- Sélectionnez --</option>
+                        <option value="découverte">🌟 Découverte (9,90€)</option>
+                        <option value="standard">⭐ Standard (14,90€)</option>
+                        <option value="premium">💎 Premium (19,90€)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Langue de la chanson *</label>
+                    <select name="langue" required>
+                        <option value="">-- Sélectionnez --</option>
+                        <option value="français">Français</option>
+                        <option value="anglais">Anglais</option>
+                        <option value="espagnol">Espagnol</option>
+                        <option value="italien">Italien</option>
+                        <option value="allemand">Allemand</option>
+                        <option value="portugais">Portugais</option>
+                        <option value="arabe">Arabe</option>
+                        <option value="mandarin">Mandarin</option>
+                        <option value="japonais">Japonais</option>
+                        <option value="russe">Russe</option>
+                        <option value="autre">Autre (précisez dans les commentaires)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Prénom(s) de l'enfant/des enfants destinataire(s) *</label>
+                    <input type="text" name="prenomEnfants" placeholder="Ex: Emma et Lucas" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Âge(s)</label>
+                    <input type="text" name="ages" placeholder="Ex: 5 ans et 3 ans">
+                </div>
+
+                <div class="form-group">
+                    <label>Thème de la chanson *</label>
+                    <select name="theme" required>
+                        <option value="">-- Sélectionnez --</option>
+                        <option value="anniversaire">🎂 Anniversaire</option>
+                        <option value="coucher">🌙 Berceuse/Coucher</option>
+                        <option value="aventure">🏔️ Aventure</option>
+                        <option value="animaux">🐾 Animaux</option>
+                        <option value="famille">👨‍👩‍👧‍👦 Famille</option>
+                        <option value="nature">🌳 Nature</option>
+                        <option value="apprentissage">📚 Apprentissage</option>
+                        <option value="noel">🎄 Noël</option>
+                        <option value="voyages">✈️ Voyages</option>
+                        <option value="amitie">👫 Amitié</option>
+                        <option value="autre">✨ Autre</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Style musical</label>
+                    <select name="style">
+                        <option value="">-- Sélectionnez (optionnel) --</option>
+                        <option value="berceuse">🎵 Berceuse douce</option>
+                        <option value="pop">🎤 Pop joyeux</option>
+                        <option value="comptine">🎼 Comptine traditionnelle</option>
+                        <option value="rock">🎸 Rock doux</option>
+                        <option value="jazz">🎺 Jazz léger</option>
+                        <option value="reggae">🌴 Reggae cool</option>
+                        <option value="classique">🎻 Classique</option>
+                        <option value="rap">🎤 Rap enfantin</option>
+                        <option value="folk">🪕 Folk</option>
+                    </select>
+                </div>
+
+                <div class="characters-section">
+                    <label>Personnages de la chanson (jusqu'à 10)</label>
+                    <p style="font-size: 0.95rem; color: #666; margin-top: 0.5rem;">
+                        Ajoutez les personnes, animaux ou personnages qui apparaîtront dans la chanson
+                    </p>
+                    <div id="charactersList"></div>
+                    <button type="button" class="add-character-btn" onclick="addCharacter()">
+                        + Ajouter un personnage
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>Anecdotes rigolotes ou moments spéciaux</label>
+                    <textarea name="anecdotes" placeholder="Partagez 2-3 anecdotes amusantes, expressions favorites, ou moments spéciaux que vous aimeriez voir dans la chanson..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Options supplémentaires</label>
+                    <div style="margin-top: 0.5rem;">
+                        <label style="display: inline-flex; align-items: center; margin-right: 1.5rem;">
+                            <input type="checkbox" id="instrumental" style="width: auto; margin-right: 0.5rem;">
+                            Version instrumentale (+3€)
+                        </label>
+                        <label style="display: inline-flex; align-items: center;">
+                            <input type="checkbox" id="secondLangue" style="width: auto; margin-right: 0.5rem;">
+                            Seconde langue (+5€)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Votre email *</label>
+                    <input type="email" name="email" placeholder="votre@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Nom pour la facturation *</label>
+                    <input type="text" name="nom" placeholder="Prénom Nom" required>
+                </div>
+
+                <button type="submit" class="cta-button" style="width: 100%; margin-top: 1.5rem;">
+                    Continuer vers le paiement 💳
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closePaymentModal()">×</button>
+            <h2 style="text-align: center; color: #9b59b6; margin-bottom: 2rem;">Finaliser votre commande</h2>
+            
+            <div class="order-summary">
+                <h3>Récapitulatif</h3>
+                <div class="summary-item">
+                    <span>Formule</span>

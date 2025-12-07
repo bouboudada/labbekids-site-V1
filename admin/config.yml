@@ -1,0 +1,128 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  - name: "config"
+    label: "Configuration du site"
+    files:
+      - label: "Contenu principal"
+        name: "site"
+        file: "content/site.json"
+        fields:
+          - label: "En-tête"
+            name: "header"
+            widget: "object"
+            fields:
+              - {label: "Nom du site", name: "siteName", widget: "string", default: "LABBE kids"}
+              - {label: "Slogan", name: "tagline", widget: "string", default: "Culture et jeux pour petits curieux"}
+              - {label: "Logo", name: "logo", widget: "image"}
+
+          - label: "Page d'accueil"
+            name: "hero"
+            widget: "object"
+            fields:
+              - {label: "Titre principal", name: "title", widget: "string"}
+              - {label: "Sous-titre", name: "subtitle", widget: "text"}
+              - {label: "Texte bouton", name: "ctaText", widget: "string", default: "Créer ma chanson 🎵"}
+
+          - label: "Section Personnages"
+            name: "characters"
+            widget: "object"
+            fields:
+              - {label: "Titre de section", name: "title", widget: "string", default: "Rencontrez Boubou et Dada"}
+              - {label: "Introduction", name: "intro", widget: "text"}
+              - label: "Dada"
+                name: "dada"
+                widget: "object"
+                fields:
+                  - {label: "Nom", name: "name", widget: "string", default: "Dada"}
+                  - {label: "Âge", name: "age", widget: "number", default: 5}
+                  - {label: "Couleur écharpe", name: "scarfColor", widget: "string", default: "violette"}
+                  - {label: "Emoji écharpe", name: "scarfEmoji", widget: "string", default: "💜"}
+                  - {label: "Couleur yeux", name: "eyeColor", widget: "string", default: "verts"}
+                  - {label: "Couleur cheveux", name: "hairColor", widget: "string", default: "châtain clair"}
+                  - {label: "Description", name: "description", widget: "text"}
+                  - {label: "Image", name: "image", widget: "image", required: false}
+              - label: "Boubou"
+                name: "boubou"
+                widget: "object"
+                fields:
+                  - {label: "Nom", name: "name", widget: "string", default: "Boubou"}
+                  - {label: "Âge", name: "age", widget: "number", default: 3}
+                  - {label: "Couleur écharpe", name: "scarfColor", widget: "string", default: "bleue"}
+                  - {label: "Emoji écharpe", name: "scarfEmoji", widget: "string", default: "💙"}
+                  - {label: "Couleur yeux", name: "eyeColor", widget: "string", default: "verts"}
+                  - {label: "Couleur cheveux", name: "hairColor", widget: "string", default: "blonds"}
+                  - {label: "Description", name: "description", widget: "text"}
+                  - {label: "Image", name: "image", widget: "image", required: false}
+
+          - label: "Avantages (Pourquoi nous choisir)"
+            name: "features"
+            widget: "list"
+            fields:
+              - {label: "Icône (emoji)", name: "icon", widget: "string"}
+              - {label: "Titre", name: "title", widget: "string"}
+              - {label: "Description", name: "description", widget: "text"}
+
+          - label: "Tarifs"
+            name: "pricing"
+            widget: "object"
+            fields:
+              - {label: "Titre section", name: "title", widget: "string", default: "Nos formules magiques"}
+              - label: "Formules"
+                name: "plans"
+                widget: "list"
+                fields:
+                  - {label: "Nom", name: "name", widget: "string"}
+                  - {label: "Icône", name: "icon", widget: "string"}
+                  - {label: "Prix", name: "price", widget: "number", value_type: "float"}
+                  - label: "Caractéristiques"
+                    name: "features"
+                    widget: "list"
+                    field: {label: "Caractéristique", name: "feature", widget: "string"}
+              - label: "Options supplémentaires"
+                name: "extras"
+                widget: "list"
+                fields:
+                  - {label: "Nom", name: "name", widget: "string"}
+                  - {label: "Prix", name: "price", widget: "number", value_type: "float"}
+
+          - label: "Formulaire de commande"
+            name: "orderForm"
+            widget: "object"
+            fields:
+              - {label: "Titre section", name: "title", widget: "string"}
+              - label: "Langues disponibles"
+                name: "languages"
+                widget: "list"
+                field: {label: "Langue", name: "language", widget: "string"}
+              - label: "Thèmes disponibles"
+                name: "themes"
+                widget: "list"
+                fields:
+                  - {label: "Nom", name: "name", widget: "string"}
+                  - {label: "Icône", name: "icon", widget: "string"}
+              - label: "Styles musicaux"
+                name: "styles"
+                widget: "list"
+                fields:
+                  - {label: "Nom", name: "name", widget: "string"}
+                  - {label: "Icône", name: "icon", widget: "string"}
+
+          - label: "Pied de page"
+            name: "footer"
+            widget: "object"
+            fields:
+              - {label: "Texte copyright", name: "copyright", widget: "string"}
+              - {label: "Email contact", name: "email", widget: "string"}
+
+          - label: "Couleurs du site"
+            name: "colors"
+            widget: "object"
+            fields:
+              - {label: "Couleur principale (violet)", name: "primary", widget: "string", default: "#9b59b6"}
+              - {label: "Couleur secondaire (bleu)", name: "secondary", widget: "string", default: "#5dade2"}

@@ -1,0 +1,158 @@
+{
+  "header": {
+    "siteName": "LABBE kids",
+    "tagline": "Culture et jeux pour petits curieux",
+    "logo": "/images/logo.png"
+  },
+  "hero": {
+    "title": "✨ Bienvenue chez LABBE kids ! ✨",
+    "subtitle": "Découvrez les chansons personnalisées magiques de Boubou et Dada, dans toutes les langues du monde 🌈",
+    "ctaText": "Créer ma chanson 🎵"
+  },
+  "characters": {
+    "title": "Rencontrez Boubou et Dada",
+    "intro": "Nous sommes frère et sœur passionnés par la musique et les chansons rigolotes. Avec nous, les enfants s'initieront à la musique tout en s'amusant !",
+    "dada": {
+      "name": "Dada",
+      "age": 5,
+      "scarfColor": "violette",
+      "scarfEmoji": "💜",
+      "eyeColor": "verts",
+      "hairColor": "châtain clair",
+      "description": "Grande sœur curieuse qui adore découvrir le monde et partager ses aventures en chansons !",
+      "image": ""
+    },
+    "boubou": {
+      "name": "Boubou",
+      "age": 3,
+      "scarfColor": "bleue",
+      "scarfEmoji": "💙",
+      "eyeColor": "verts",
+      "hairColor": "blonds",
+      "description": "Petit frère joyeux qui suit sa grande sœur partout et transforme chaque moment en mélodie rigolote !",
+      "image": ""
+    }
+  },
+  "features": [
+    {
+      "icon": "🌍",
+      "title": "Multilingue",
+      "description": "Chansons dans toutes les langues pour célébrer la diversité culturelle"
+    },
+    {
+      "icon": "🎨",
+      "title": "100% Personnalisé",
+      "description": "Avec les prénoms, anecdotes et personnages de votre choix"
+    },
+    {
+      "icon": "❤️",
+      "title": "Fait avec amour",
+      "description": "Chaque chanson est unique et créée spécialement pour votre enfant"
+    },
+    {
+      "icon": "⚡",
+      "title": "Livraison rapide",
+      "description": "Recevez votre chanson par email en 3-5 jours"
+    }
+  ],
+  "pricing": {
+    "title": "Nos formules magiques",
+    "plans": [
+      {
+        "name": "découverte",
+        "icon": "🌟",
+        "price": 9.90,
+        "features": [
+          "1 à 3 personnages",
+          "1 langue",
+          "Durée 2-3 minutes",
+          "Format MP3",
+          "Thème au choix"
+        ]
+      },
+      {
+        "name": "standard",
+        "icon": "⭐",
+        "price": 14.90,
+        "features": [
+          "4 à 6 personnages",
+          "1 langue",
+          "Durée 2-3 minutes",
+          "Format MP3",
+          "Anecdotes personnalisées"
+        ]
+      },
+      {
+        "name": "premium",
+        "icon": "💎",
+        "price": 19.90,
+        "features": [
+          "7 à 10 personnages",
+          "1 langue",
+          "Durée 2-3 minutes",
+          "Format MP3",
+          "Anecdotes détaillées",
+          "Style musical spécifique"
+        ]
+      }
+    ],
+    "extras": [
+      {
+        "name": "Version instrumentale",
+        "price": 3.00
+      },
+      {
+        "name": "Seconde langue",
+        "price": 5.00
+      }
+    ]
+  },
+  "orderForm": {
+    "title": "Créez votre chanson personnalisée",
+    "languages": [
+      "Français",
+      "Anglais",
+      "Espagnol",
+      "Italien",
+      "Allemand",
+      "Portugais",
+      "Arabe",
+      "Mandarin",
+      "Japonais",
+      "Russe",
+      "Autre"
+    ],
+    "themes": [
+      {"name": "Anniversaire", "icon": "🎂"},
+      {"name": "Berceuse/Coucher", "icon": "🌙"},
+      {"name": "Aventure", "icon": "🏔️"},
+      {"name": "Animaux", "icon": "🐾"},
+      {"name": "Famille", "icon": "👨‍👩‍👧‍👦"},
+      {"name": "Nature", "icon": "🌳"},
+      {"name": "Apprentissage", "icon": "📚"},
+      {"name": "Noël", "icon": "🎄"},
+      {"name": "Voyages", "icon": "✈️"},
+      {"name": "Amitié", "icon": "👫"},
+      {"name": "Autre", "icon": "✨"}
+    ],
+    "styles": [
+      {"name": "Berceuse douce", "icon": "🎵"},
+      {"name": "Pop joyeux", "icon": "🎤"},
+      {"name": "Comptine traditionnelle", "icon": "🎼"},
+      {"name": "Rock doux", "icon": "🎸"},
+      {"name": "Jazz léger", "icon": "🎺"},
+      {"name": "Reggae cool", "icon": "🌴"},
+      {"name": "Classique", "icon": "🎻"},
+      {"name": "Rap enfantin", "icon": "🎤"},
+      {"name": "Folk", "icon": "🪕"}
+    ]
+  },
+  "footer": {
+    "copyright": "© 2024 LABBE kids - Tous droits réservés",
+    "email": "contact@bouboudada.com"
+  },
+  "colors": {
+    "primary": "#9b59b6",
+    "secondary": "#5dade2"
+  }
+}
