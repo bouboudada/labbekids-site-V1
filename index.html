@@ -813,4 +813,199 @@
             <div class="order-summary">
                 <h3>Récapitulatif</h3>
                 <div class="summary-item">
-                    <span>Formule</span>
+                    <span id="summaryPlan">-</span>
+                </div>
+                <div class="summary-item">
+                    <span>Options</span>
+                    <span id="summaryOptions">-</span>
+                </div>
+                <div class="summary-item">
+                    <span>Total</span>
+                    <span id="summaryTotal">-</span>
+                </div>
+            </div>
+
+            <div class="payment-option" onclick="payWithStripe()">
+                <h3>💳 Carte bancaire</h3>
+                <p>Paiement sécurisé par Stripe</p>
+            </div>
+
+            <div class="payment-option">
+                <h3>🅿️ PayPal</h3>
+                <p>Paiement sécurisé par PayPal</p>
+                <div id="paypal-button-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon">🎉</div>
+            <h2 style="text-align: center; color: #9b59b6; margin-bottom: 1rem;">Merci pour votre commande !</h2>
+            <p style="text-align: center; font-size: 1.1rem; line-height: 1.6;">
+                Votre chanson personnalisée est en cours de création.<br>
+                Vous recevrez un email de confirmation dans quelques minutes.
+            </p>
+            <button class="cta-button" style="width: 100%; margin-top: 2rem;" onclick="closeSuccessModal()">
+                Fermer
+            </button>
+        </div>
+    </div>
+
+    <footer id="contact">
+        <p>© 2025 LABBE kids - Tous droits réservés</p>
+        <p style="margin-top: 1rem;">Contact : contact@labbekids.com</p>
+    </footer>
+
+    <!-- Netlify Identity Widget -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script>
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                        document.location.href = "/admin/";
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script>
+        let characterCount = 0;
+        let currentOrderData = {};
+
+        function selectPlan(plan) {
+            document.getElementById('plan').value = plan;
+            document.getElementById('commander').scrollIntoView({behavior: 'smooth'});
+        }
+
+        function addCharacter() {
+            if (characterCount >= 10) {
+                alert('Maximum 10 personnages');
+                return;
+            }
+            characterCount++;
+            const container = document.getElementById('charactersList');
+            const div = document.createElement('div');
+            div.className = 'character-item';
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <strong>Personnage ${characterCount}</strong>
+                    <button type="button" onclick="this.parentElement.parentElement.remove(); characterCount--;" 
+                            style="background: #e74c3c; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 5px; cursor: pointer;">
+                        Supprimer
+                    </button>
+                </div>
+                <input type="text" name="character${characterCount}Name" placeholder="Nom/Prénom" style="margin-bottom: 0.5rem;">
+                <input type="text" name="character${characterCount}Role" placeholder="Rôle (ex: grand-mère, chat, meilleur ami...)">
+            `;
+            container.appendChild(div);
+        }
+
+        function calculateTotal() {
+            const plan = document.getElementById('plan').value;
+            const instrumental = document.getElementById('instrumental').checked;
+            const secondLangue = document.getElementById('secondLangue').checked;
+            
+            let total = 0;
+            let planName = '';
+            
+            switch(plan) {
+                case 'découverte': total = 9.90; planName = '🌟 Découverte'; break;
+                case 'standard': total = 14.90; planName = '⭐ Standard'; break;
+                case 'premium': total = 19.90; planName = '💎 Premium'; break;
+            }
+            
+            let options = [];
+            if (instrumental) { total += 3; options.push('Instrumental'); }
+            if (secondLangue) { total += 5; options.push('2ème langue'); }
+            
+            return { total, planName, options };
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            currentOrderData = Object.fromEntries(formData);
+            currentOrderData.instrumental = document.getElementById('instrumental').checked;
+            currentOrderData.secondLangue = document.getElementById('secondLangue').checked;
+            
+            const { total, planName, options } = calculateTotal();
+            currentOrderData.total = total;
+            
+            document.getElementById('summaryPlan').textContent = planName;
+            document.getElementById('summaryOptions').textContent = options.length > 0 ? options.join(', ') : 'Aucune';
+            document.getElementById('summaryTotal').textContent = total.toFixed(2) + '€';
+            
+            document.getElementById('paymentModal').style.display = 'flex';
+            initPayPalButton();
+        });
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').style.display = 'none';
+            location.reload();
+        }
+
+        async function payWithStripe() {
+            try {
+                const response = await fetch('/.netlify/functions/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentOrderData)
+                });
+                
+                const { sessionId } = await response.json();
+                const stripe = Stripe('pk_live_51Sb1wD0ZxmBgQms1I2LqR2RGpDl6gphfsHEN6rFzgUj6VXs7lcNglty3FmCqut9GbwrJc1TaLP4V9FsOf6ymhrVT00VQpd5zHx');
+                await stripe.redirectToCheckout({ sessionId });
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du paiement. Veuillez réessayer.');
+            }
+        }
+
+        function initPayPalButton() {
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = '';
+            
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: { value: currentOrderData.total.toFixed(2) },
+                            description: 'Chanson personnalisée LABBE kids'
+                        }]
+                    });
+                },
+                onApprove: async function(data, actions) {
+                    const order = await actions.order.capture();
+                    await saveOrder(order.id, 'paypal');
+                    closePaymentModal();
+                    document.getElementById('successModal').style.display = 'flex';
+                }
+            }).render('#paypal-button-container');
+        }
+
+        async function saveOrder(paymentId, method) {
+            try {
+                await fetch('/.netlify/functions/save-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...currentOrderData,
+                        paymentId,
+                        paymentMethod: method
+                    })
+                });
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+            }
+        }
+    </script>
+</body>
+</html>
