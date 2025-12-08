@@ -61,7 +61,7 @@
       {
         "name": "découverte",
         "icon": "🌟",
-        "price": 9.90,
+        "price": 9.9,
         "features": [
           "1 à 3 personnages",
           "1 langue",
@@ -73,7 +73,7 @@
       {
         "name": "standard",
         "icon": "⭐",
-        "price": 14.90,
+        "price": 14.9,
         "features": [
           "4 à 6 personnages",
           "1 langue",
@@ -85,7 +85,7 @@
       {
         "name": "premium",
         "icon": "💎",
-        "price": 19.90,
+        "price": 19.9,
         "features": [
           "7 à 10 personnages",
           "1 langue",
@@ -99,11 +99,11 @@
     "extras": [
       {
         "name": "Version instrumentale",
-        "price": 3.00
+        "price": 3
       },
       {
         "name": "Seconde langue",
-        "price": 5.00
+        "price": 5
       }
     ]
   },
@@ -123,28 +123,88 @@
       "Autre"
     ],
     "themes": [
-      {"name": "Anniversaire", "icon": "🎂"},
-      {"name": "Berceuse/Coucher", "icon": "🌙"},
-      {"name": "Aventure", "icon": "🏔️"},
-      {"name": "Animaux", "icon": "🐾"},
-      {"name": "Famille", "icon": "👨‍👩‍👧‍👦"},
-      {"name": "Nature", "icon": "🌳"},
-      {"name": "Apprentissage", "icon": "📚"},
-      {"name": "Noël", "icon": "🎄"},
-      {"name": "Voyages", "icon": "✈️"},
-      {"name": "Amitié", "icon": "👫"},
-      {"name": "Autre", "icon": "✨"}
+      {
+        "name": "Anniversaire",
+        "icon": "🎂"
+      },
+      {
+        "name": "Berceuse/Coucher",
+        "icon": "🌙"
+      },
+      {
+        "name": "Aventure",
+        "icon": "🏔️"
+      },
+      {
+        "name": "Animaux",
+        "icon": "🐾"
+      },
+      {
+        "name": "Famille",
+        "icon": "👨‍👩‍👧‍👦"
+      },
+      {
+        "name": "Nature",
+        "icon": "🌳"
+      },
+      {
+        "name": "Apprentissage",
+        "icon": "📚"
+      },
+      {
+        "name": "Noël",
+        "icon": "🎄"
+      },
+      {
+        "name": "Voyages",
+        "icon": "✈️"
+      },
+      {
+        "name": "Amitié",
+        "icon": "👫"
+      },
+      {
+        "name": "Autre",
+        "icon": "✨"
+      }
     ],
     "styles": [
-      {"name": "Berceuse douce", "icon": "🎵"},
-      {"name": "Pop joyeux", "icon": "🎤"},
-      {"name": "Comptine traditionnelle", "icon": "🎼"},
-      {"name": "Rock doux", "icon": "🎸"},
-      {"name": "Jazz léger", "icon": "🎺"},
-      {"name": "Reggae cool", "icon": "🌴"},
-      {"name": "Classique", "icon": "🎻"},
-      {"name": "Rap enfantin", "icon": "🎤"},
-      {"name": "Folk", "icon": "🪕"}
+      {
+        "name": "Berceuse douce",
+        "icon": "🎵"
+      },
+      {
+        "name": "Pop joyeux",
+        "icon": "🎤"
+      },
+      {
+        "name": "Comptine traditionnelle",
+        "icon": "🎼"
+      },
+      {
+        "name": "Rock doux",
+        "icon": "🎸"
+      },
+      {
+        "name": "Jazz léger",
+        "icon": "🎺"
+      },
+      {
+        "name": "Reggae cool",
+        "icon": "🌴"
+      },
+      {
+        "name": "Classique",
+        "icon": "🎻"
+      },
+      {
+        "name": "Rap enfantin",
+        "icon": "🎤"
+      },
+      {
+        "name": "Folk",
+        "icon": "🪕"
+      }
     ]
   },
   "footer": {
