@@ -2,6 +2,16 @@
   publish = "."
   functions = "netlify/functions"
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Type = "text/html; charset=UTF-8"
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/index.html"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
