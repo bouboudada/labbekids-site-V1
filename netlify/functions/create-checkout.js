@@ -21,16 +21,20 @@ exports.handler = async (event, context) => {
   try {
     const body = JSON.parse(event.body || '{}');
 
-    const amount = Number(body.amount);
+    // amount envoyé par le front = total en EUROS (9.9, 12.9, 19.9…)
+    const amountEuro = Number(body.amount);
     const orderData = body.orderData || {};
 
-    if (!amount || Number.isNaN(amount)) {
+    if (!amountEuro || Number.isNaN(amountEuro)) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ error: 'Invalid or missing amount' }),
       };
     }
+
+    // Stripe attend un montant en CENTIMES (entier)
+    const amountCents = Math.round(amountEuro * 100);
 
     const plan = orderData.plan || 'Découverte';
     const prenom = orderData.prenomEnfants || 'Enfant';
@@ -46,8 +50,7 @@ exports.handler = async (event, context) => {
               name: `Chanson personnalisée LABBE kids - Formule ${plan}`,
               description: `Pour ${prenom}`,
             },
-            // Stripe attend un montant en CENTIMES (entier)
-            unit_amount: amount,
+            unit_amount: amountCents, // ex : 1290 pour 12,90 €
           },
           quantity: 1,
         },
