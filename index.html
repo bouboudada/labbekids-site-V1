@@ -930,6 +930,8 @@
             
             const { total, planName, options } = calculateTotal();
             currentOrderData.total = total;
+            // 🔹 montant utilisé pour Stripe (en euros)
+            currentOrderData.amount = total;
             
             document.getElementById('summaryPlan').textContent = planName;
             document.getElementById('summaryOptions').textContent = options.length > 0 ? options.join(', ') : 'Aucune';
@@ -953,12 +955,22 @@
                 const response = await fetch('/.netlify/functions/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(currentOrderData)
+                    body: JSON.stringify({
+                        amount: currentOrderData.amount,     // total en euros
+                        orderData: currentOrderData         // détails commande
+                    })
                 });
                 
-                const { sessionId } = await response.json();
+                const data = await response.json();
+
+                if (!data.id) {
+                    console.error('Erreur create-checkout:', data);
+                    alert("Impossible de créer la session de paiement.");
+                    return;
+                }
+
                 const stripe = Stripe('pk_live_51Sb1wD0ZxmBgQms1I2LqR2RGpDl6gphfsHEN6rFzgUj6VXs7lcNglty3FmCqut9GbwrJc1TaLP4V9FsOf6ymhrVT00VQpd5zHx');
-                await stripe.redirectToCheckout({ sessionId });
+                await stripe.redirectToCheckout({ sessionId: data.id });
             } catch (error) {
                 console.error('Erreur:', error);
                 alert('Erreur lors du paiement. Veuillez réessayer.');
