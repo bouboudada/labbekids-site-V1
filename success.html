@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande confirmée - LABBE Kids</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fef6fb 0%, #f0f8ff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.1);
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            color: #9b59b6;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #555;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .order-id {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border-left: 4px solid #9b59b6;
+        }
+
+        .order-id strong {
+            color: #9b59b6;
+        }
+
+        .info-box {
+            background: #fff9e6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border-left: 4px solid #f39c12;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #f39c12;
+            margin-bottom: 15px;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-box li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .info-box li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #9b59b6 0%, #5dade2 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.5);
+        }
+
+        .contact {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e0e0e0;
+            color: #777;
+        }
+
+        .contact a {
+            color: #9b59b6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .success-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">🎉</div>
+        
+        <h1>Paiement confirmé !</h1>
+        
+        <p>Merci pour votre commande. Votre paiement a été traité avec succès.</p>
+
+        <div class="order-id">
+            <p><strong>Numéro de commande :</strong><br><span id="orderId">Chargement...</span></p>
+        </div>
+
+        <div class="info-box">
+            <h3>📅 Prochaines étapes</h3>
+            <ul>
+                <li>Vous allez recevoir un <strong>email de confirmation</strong> dans quelques minutes</li>
+                <li>Notre équipe commence la création de votre <strong>chanson personnalisée</strong></li>
+                <li>Vous recevrez votre chanson par email sous <strong>2-3 jours ouvrables</strong></li>
+                <li>Vous pourrez la télécharger et l'écouter <strong>autant de fois que vous le souhaitez</strong></li>
+            </ul>
+        </div>
+
+        <p style="margin-top: 30px;">
+            <strong>💡 Conseil :</strong> Ajoutez <strong>contact@dadaboubou.com</strong> à vos contacts pour être sûr de recevoir votre chanson !
+        </p>
+
+        <a href="/" class="button">Retour à l'accueil</a>
+
+        <div class="contact">
+            <p>Une question ? Contactez-nous à<br>
+            <a href="mailto:contact@dadaboubou.com">contact@dadaboubou.com</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Récupérer le session_id de l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        
+        if (sessionId) {
+            document.getElementById('orderId').textContent = sessionId.substring(0, 20) + '...';
+        } else {
+            document.getElementById('orderId').textContent = 'Non disponible';
+        }
+    </script>
+</body>
+</html>
+Add success page after payment
