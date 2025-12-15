@@ -20,7 +20,7 @@
       "eyeColor": "verts",
       "hairColor": "châtain clair",
       "description": "Grande sœur curieuse qui adore découvrir le monde et partager ses aventures en chansons !",
-      "image": "/images/image_08-12-2025_à_10.26-removebg-preview-1-.png"
+      "image": "/images/Dada.png"
     },
     "boubou": {
       "name": "Boubou",
@@ -30,7 +30,7 @@
       "eyeColor": "verts",
       "hairColor": "blonds",
       "description": "Petit frère joyeux qui suit sa grande sœur partout et transforme chaque moment en mélodie rigolote !",
-      "image": "/images/image_08-12-2025_à_10.26-removebg-preview.png"
+      "image": "/images/Boubou.png"
     }
   },
   "features": [
