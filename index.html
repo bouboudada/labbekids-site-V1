@@ -7,7 +7,6 @@
     <title>LABBE Kids - Culture et jeux pour petits curieux</title>
     
     <script src="https://js.stripe.com/v3/"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AXgr9Z0bI9ortde2R_m9GkHIKmLli1-1rvdxV9gL7kYcoT7bQDI0kGqgSigtmurB88Nv0ofjvlSB2XU2&currency=EUR"></script>
     
     <style>
         * {
@@ -792,6 +791,13 @@
                     <input type="text" name="nom" placeholder="Prénom Nom" required>
                 </div>
 
+                <div class="form-group" style="background: #fff9e6; padding: 20px; border-radius: 10px; border-left: 4px solid #f39c12; margin: 20px 0;">
+                    <label style="display: flex; align-items: flex-start; cursor: pointer; font-weight: normal;">
+                        <input type="checkbox" id="accept_cgv" name="accept_cgv" required style="width: auto; margin-right: 10px; margin-top: 4px; flex-shrink: 0;">
+                        <span>J'ai lu et j'accepte les <a href="/cgv.html" target="_blank" style="color: #9b59b6; text-decoration: underline; font-weight: bold;">Conditions Générales de Vente</a> *</span>
+                    </label>
+                </div>
+
                 <button type="submit" class="cta-button" style="width: 100%; margin-top: 1.5rem;">
                     Continuer vers le paiement 💳
                 </button>
@@ -823,12 +829,6 @@
                 <h3>💳 Carte bancaire</h3>
                 <p>Paiement sécurisé par Stripe</p>
             </div>
-
-            <div class="payment-option">
-                <h3>🅿️ PayPal</h3>
-                <p>Paiement sécurisé par PayPal</p>
-                <div id="paypal-button-container"></div>
-            </div>
         </div>
     </div>
 
@@ -848,11 +848,15 @@
 
     <footer id="contact">
         <p>© 2025 LABBE Kids - Tous droits réservés</p>
-        <p style="margin-top: 1rem;">Contact : contact@bouboudada.com</p>
+        <p style="margin-top: 1rem;">Contact : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b7d4d8d9c3d6d4c3f7d5d8c2d5d8c2d3d6d3d699d4d8da">[email&#160;protected]</a></p>
+        <p style="margin-top: 1rem;">
+            <a href="/cgv.html" style="color: white; text-decoration: underline; margin: 0 10px;">CGV</a> | 
+            <a href="/cgv.html" style="color: white; text-decoration: underline; margin: 0 10px;">Mentions Légales</a>
+        </p>
     </footer>
 
     <!-- Netlify Identity Widget -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script>
         if (window.netlifyIdentity) {
             window.netlifyIdentity.on("init", user => {
@@ -921,14 +925,22 @@
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Vérifier les CGV
+            const cgvCheckbox = document.getElementById('accept_cgv');
+            if (!cgvCheckbox.checked) {
+                alert('Vous devez accepter les Conditions Générales de Vente pour continuer.');
+                cgvCheckbox.focus();
+                return false;
+            }
+            
             const formData = new FormData(this);
             currentOrderData = Object.fromEntries(formData);
             currentOrderData.instrumental = document.getElementById('instrumental').checked;
             currentOrderData.secondLangue = document.getElementById('secondLangue').checked;
+            currentOrderData.accept_cgv = true; // CGV acceptées
             
             const { total, planName, options } = calculateTotal();
             currentOrderData.total = total;
-            // 🔹 montant utilisé pour Stripe (en euros)
             currentOrderData.amount = total;
             
             document.getElementById('summaryPlan').textContent = planName;
@@ -936,7 +948,6 @@
             document.getElementById('summaryTotal').textContent = total.toFixed(2) + '€';
             
             document.getElementById('paymentModal').style.display = 'flex';
-            initPayPalButton();
         });
 
         function closePaymentModal() {
@@ -954,8 +965,8 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: currentOrderData.amount,     // total en euros
-                        orderData: currentOrderData         // détails commande
+                        amount: currentOrderData.amount,
+                        orderData: currentOrderData
                     })
                 });
                 
@@ -974,44 +985,5 @@
                 alert('Erreur lors du paiement. Veuillez réessayer.');
             }
         }
-
-        function initPayPalButton() {
-            const container = document.getElementById('paypal-button-container');
-            container.innerHTML = '';
-            
-            paypal.Buttons({
-                createOrder: function(data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: { value: currentOrderData.total.toFixed(2) },
-                            description: 'Chanson personnalisée LABBE Kids'
-                        }]
-                    });
-                },
-                onApprove: async function(data, actions) {
-                    const order = await actions.order.capture();
-                    await saveOrder(order.id, 'paypal');
-                    closePaymentModal();
-                    document.getElementById('successModal').style.display = 'flex';
-                }
-            }).render('#paypal-button-container');
-        }
-
-        async function saveOrder(paymentId, method) {
-            try {
-                await fetch('/.netlify/functions/save-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ...currentOrderData,
-                        paymentId,
-                        paymentMethod: method
-                    })
-                });
-            } catch (error) {
-                console.error('Erreur sauvegarde:', error);
-            }
-        }
     </script>
-</body>
-</html>
+    Update index with CGV and remove PayPal
