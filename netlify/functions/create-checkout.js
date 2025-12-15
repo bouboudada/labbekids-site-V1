@@ -1,15 +1,26 @@
 // netlify/functions/create-checkout.js
-
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const nodemailer = require('nodemailer');
+
+// Configuration email
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: process.env.SMTP_PORT || 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER, // votre email
+    pass: process.env.SMTP_PASS  // mot de passe d'application Gmail
+  }
+});
 
 exports.handler = async (event, context) => {
+  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
-  // Preflight CORS
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
@@ -19,60 +30,59 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const body = JSON.parse(event.body || '{}');
+    const { amount, orderData } = JSON.parse(event.body);
 
-    // amount envoyé par le front = total en EUROS (9.9, 12.9, 19.9…)
-    const amountEuro = Number(body.amount);
-    const orderData = body.orderData || {};
-
-    if (!amountEuro || Number.isNaN(amountEuro)) {
+    // Validation
+    if (!amount || !orderData || !orderData.email || !orderData.accept_cgv) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Invalid or missing amount' }),
+        body: JSON.stringify({ error: 'Données manquantes ou CGV non acceptées' })
       };
     }
 
-    // Stripe attend un montant en CENTIMES (entier)
-    const amountCents = Math.round(amountEuro * 100);
-
-    const plan = orderData.plan || 'Découverte';
-    const prenom = orderData.prenomEnfants || 'Enfant';
-
+    // Créer la session Stripe
     const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `Chanson personnalisée LABBE kids - Formule ${plan}`,
-              description: `Pour ${prenom}`,
+              name: `Chanson personnalisée - ${orderData.plan}`,
+              description: `Pour ${orderData.childName || 'l\'enfant'}`,
             },
-            unit_amount: amountCents, // ex : 1290 pour 12,90 €
+            unit_amount: Math.round(amount * 100), // en centimes
           },
           quantity: 1,
         },
       ],
-      success_url: `${process.env.URL || 'https://bouboudada.com'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.URL || 'https://bouboudada.com'}/#commander`,
+      mode: 'payment',
+      success_url: `${process.env.URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.URL}/#commander`,
+      customer_email: orderData.email,
       metadata: {
         orderData: JSON.stringify(orderData),
-      },
+        customerEmail: orderData.email,
+        customerName: orderData.nom,
+        childName: orderData.childName,
+        plan: orderData.plan,
+        timestamp: new Date().toISOString()
+      }
     });
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ id: session.id }),
+      body: JSON.stringify({ id: session.id, url: session.url })
     };
+
   } catch (error) {
-    console.error('Stripe create-checkout error:', error);
+    console.error('Erreur création session:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: error.message }),
+      body: JSON.stringify({ error: error.message })
     };
   }
 };
