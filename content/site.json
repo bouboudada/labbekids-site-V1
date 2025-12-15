@@ -20,7 +20,7 @@
       "eyeColor": "verts",
       "hairColor": "châtain clair",
       "description": "Grande sœur curieuse qui adore découvrir le monde et partager ses aventures en chansons !",
-      "image": "/images/Dada.png"
+      "image": "https://github.com/bouboudada/labbekids-site-V1/blob/main/images/Dada.png"
     },
     "boubou": {
       "name": "Boubou",
@@ -30,7 +30,7 @@
       "eyeColor": "verts",
       "hairColor": "blonds",
       "description": "Petit frère joyeux qui suit sa grande sœur partout et transforme chaque moment en mélodie rigolote !",
-      "image": "/images/Boubou.png"
+      "image": "https://github.com/bouboudada/labbekids-site-V1/blob/main/images/Boubou.png"
     }
   },
   "features": [
