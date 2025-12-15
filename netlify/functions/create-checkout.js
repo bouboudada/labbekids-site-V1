@@ -58,8 +58,8 @@ exports.handler = async (event, context) => {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.URL}/#commander`,
+      success_url: `${process.env.SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.SITE_URL}/#commander`,
       customer_email: orderData.email,
       metadata: {
         orderData: JSON.stringify(orderData),
