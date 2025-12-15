@@ -120,7 +120,7 @@ exports.handler = async (event, context) => {
               </div>
               <div class="footer">
                 <p>© 2025 LABBE Kids - Tous droits réservés</p>
-                <p><a href="${process.env.URL}/cgv.html">Conditions Générales de Vente</a></p>
+                <p><a href="${process.env.SITE_URL}/cgv.html">Conditions Générales de Vente</a></p>
               </div>
             </div>
           </body>
