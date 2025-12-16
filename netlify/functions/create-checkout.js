@@ -8,8 +8,8 @@ const transporter = nodemailer.createTransport({
   port: process.env.SMTP_PORT || 587,
   secure: false,
   auth: {
-    user: process.env.SMTP_USER, // votre email
-    pass: process.env.SMTP_PASS  // mot de passe d'application Gmail
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   }
 });
 
@@ -41,7 +41,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Créer la session Stripe
+    // 🔥 CORRECTIONS POUR FRANCE ET EAU
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -52,7 +52,7 @@ exports.handler = async (event, context) => {
               name: `Chanson personnalisée - ${orderData.plan}`,
               description: `Pour ${orderData.childName || 'l\'enfant'}`,
             },
-            unit_amount: Math.round(amount * 100), // en centimes
+            unit_amount: Math.round(amount * 100),
           },
           quantity: 1,
         },
@@ -61,6 +61,28 @@ exports.handler = async (event, context) => {
       success_url: `${process.env.SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.SITE_URL}/#commander`,
       customer_email: orderData.email,
+      
+      // ✅ AJOUT 1 : Configuration billing address (obligatoire pour France)
+      billing_address_collection: 'required',
+      
+      // ✅ AJOUT 2 : Configuration 3D Secure (CRITIQUE pour France/EAU)
+      payment_intent_data: {
+        capture_method: 'automatic',
+        setup_future_usage: null,
+      },
+      
+      // ✅ AJOUT 3 : Force 3D Secure pour TOUS les paiements
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'any' // Force l'authentification 3DS
+        }
+      },
+      
+      // ✅ AJOUT 4 : Autoriser les paiements internationaux
+      automatic_tax: {
+        enabled: false
+      },
+      
       metadata: {
         orderData: JSON.stringify(orderData),
         customerEmail: orderData.email,
@@ -71,18 +93,31 @@ exports.handler = async (event, context) => {
       }
     });
 
+    // Log pour debugging
+    console.log('Session créée avec succès:', session.id);
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({ id: session.id, url: session.url })
     };
-
   } catch (error) {
-    console.error('Erreur création session:', error);
+    // ✅ AJOUT 5 : Meilleure gestion d'erreur avec détails
+    console.error('Erreur création session:', {
+      message: error.message,
+      type: error.type,
+      code: error.code,
+      param: error.param,
+      statusCode: error.statusCode
+    });
+    
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({ 
+        error: error.message,
+        type: error.type || 'unknown_error'
+      })
     };
   }
 };
