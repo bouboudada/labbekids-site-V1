@@ -933,10 +933,17 @@
             }
             
             const formData = new FormData(this);
-            currentOrderData = Object.fromEntries(formData);
-            currentOrderData.instrumental = document.getElementById('instrumental').checked;
-            currentOrderData.secondLangue = document.getElementById('secondLangue').checked;
-            currentOrderData.accept_cgv = true; // CGV acceptées
+currentOrderData = Object.fromEntries(formData);
+
+// Mapper les champs vers les noms attendus par le webhook
+currentOrderData.childName = currentOrderData.prenomEnfants || 'Non spécifié';
+currentOrderData.age = currentOrderData.ages || 'Non spécifié';
+currentOrderData.message = currentOrderData.anecdotes || 'Aucun';
+currentOrderData.occasion = currentOrderData.theme; // Le thème sert d'occasion
+
+currentOrderData.instrumental = document.getElementById('instrumental').checked;
+currentOrderData.secondLangue = document.getElementById('secondLangue').checked;
+currentOrderData.accept_cgv = true; // CGV acceptées
             
             const { total, planName, options } = calculateTotal();
             currentOrderData.total = total;
