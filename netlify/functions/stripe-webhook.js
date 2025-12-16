@@ -114,7 +114,7 @@ exports.handler = async (event, context) => {
                   <li>Vous pourrez la télécharger et l'écouter autant de fois que vous le souhaitez</li>
                 </ol>
 
-                <p style="margin-top: 30px;">Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:contact@dadaboubou.com">contact@dadaboubou.com</a></p>
+                <p style="margin-top: 30px;">Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:contact@bouboudada.com">contact@bouboudada.com</a></p>
 
                 <p style="margin-top: 30px;">À très bientôt,<br><strong>L'équipe LABBE Kids</strong></p>
               </div>
