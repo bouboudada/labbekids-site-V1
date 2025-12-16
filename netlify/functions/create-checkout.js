@@ -30,10 +30,17 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    console.log('=== DEBUT CREATE-CHECKOUT ===');
+    console.log('Event body:', event.body);
+    
     const { amount, orderData } = JSON.parse(event.body);
+    
+    console.log('Amount:', amount);
+    console.log('OrderData:', JSON.stringify(orderData));
 
     // Validation
     if (!amount || !orderData || !orderData.email || !orderData.accept_cgv) {
+      console.error('Validation échouée:', { amount, hasOrderData: !!orderData, hasEmail: !!orderData?.email, hasCGV: !!orderData?.accept_cgv });
       return {
         statusCode: 400,
         headers,
@@ -42,6 +49,10 @@ exports.handler = async (event, context) => {
     }
 
     // 🔥 CORRECTIONS POUR FRANCE ET EAU
+    console.log('Création de la session Stripe...');
+    console.log('STRIPE_SECRET_KEY exists:', !!process.env.STRIPE_SECRET_KEY);
+    console.log('SITE_URL:', process.env.SITE_URL);
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
