@@ -67,8 +67,7 @@ exports.handler = async (event, context) => {
       
       // ✅ AJOUT 2 : Configuration 3D Secure (CRITIQUE pour France/EAU)
       payment_intent_data: {
-        capture_method: 'automatic',
-        setup_future_usage: null,
+        capture_method: 'automatic'
       },
       
       // ✅ AJOUT 3 : Force 3D Secure pour TOUS les paiements
