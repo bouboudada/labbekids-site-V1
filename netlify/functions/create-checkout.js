@@ -23,6 +23,8 @@ function cleanString(str) {
 }
 
 exports.handler = async (event, context) => {
+  console.log('🔥🔥🔥 FONCTION APPELEE - DEBUT ABSOLU 🔥🔥🔥');
+  
   // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
