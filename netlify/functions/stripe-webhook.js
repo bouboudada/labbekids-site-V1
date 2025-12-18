@@ -33,13 +33,31 @@ exports.handler = async (event, context) => {
     try {
       console.log('🔔 Webhook reçu pour session:', session.id);
       
-      // Récupérer la session complète avec line_items
+      // Récupérer la session complète avec line_items ET leurs price_data
       const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
-        expand: ['line_items']
+        expand: ['line_items.data.price.product']
       });
       
-      // Récupérer TOUTES les données depuis la description du produit
-      const description = fullSession.line_items?.data?.[0]?.description || '';
+      console.log('📦 Session récupérée');
+      
+      // Récupérer le produit pour avoir la description
+      const lineItem = fullSession.line_items?.data?.[0];
+      let description = '';
+      
+      if (lineItem) {
+        // Essayer de récupérer la description du produit
+        const productId = lineItem.price?.product;
+        if (typeof productId === 'string') {
+          // Le produit est un ID, il faut le récupérer
+          const product = await stripe.products.retrieve(productId);
+          description = product.description || '';
+        } else if (typeof productId === 'object' && productId?.description) {
+          // Le produit est déjà expandé
+          description = productId.description;
+        }
+      }
+      
+      console.log('📋 Description récupérée:', description ? 'Oui (' + description.length + ' chars)' : 'Non');
       
       // Infos de base depuis metadata
       const customerEmail = fullSession.metadata.customerEmail || fullSession.customer_email;
@@ -64,7 +82,7 @@ exports.handler = async (event, context) => {
 - Paiement ID: ${paymentId}
 - Montant: ${amount}€
 
-${description}
+${description || 'Aucune description disponible'}
       `.trim();
 
       // EMAIL 1: Confirmation au CLIENT
@@ -110,7 +128,7 @@ ${description}
                   <li>Vous pourrez la télécharger et l'écouter autant de fois que vous le souhaitez</li>
                 </ol>
 
-                <p style="margin-top: 30px;">Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:${process.env.SMTP_USER}">${process.env.SMTP_USER}</a></p>
+                <p style="margin-top: 30px;">Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:contact@bouboudada.com">contact@bouboudada.com</a></p>
 
                 <p style="margin-top: 30px;">À très bientôt,<br><strong>L'équipe LABBE Kids</strong></p>
               </div>
