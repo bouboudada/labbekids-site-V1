@@ -23,8 +23,6 @@ function cleanString(str) {
 }
 
 exports.handler = async (event, context) => {
-  console.log('🔥🔥🔥 FONCTION APPELEE - DEBUT ABSOLU 🔥🔥🔥');
-  
   // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -134,11 +132,15 @@ exports.handler = async (event, context) => {
       },
       
       metadata: {
-        orderData: JSON.stringify(cleanedData),
+        // ⚠️ Stripe limite: 500 caractères par valeur
+        // Ne pas mettre orderData complet ici !
         customerEmail: cleanedData.email,
         customerName: cleanedData.nom,
         childName: cleanedData.childName || cleanedData.prenomEnfants,
         plan: cleanedData.plan,
+        langue: cleanedData.langue || 'français',
+        theme: cleanedData.theme || '',
+        age: cleanedData.age || cleanedData.ages || '',
         timestamp: new Date().toISOString()
       }
     });
