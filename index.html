@@ -533,6 +533,13 @@
             margin-bottom: 1rem;
         }
 
+        .char-counter {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2rem;
@@ -593,11 +600,13 @@
         </p>
         <div class="characters">
             <div class="character-card dada">
-<div class="character-illustration"><img src="/images/Dada.png" alt="Dada" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>                <h3>Dada</h3>
+                <div class="character-illustration"><img src="/images/Dada.png" alt="Dada" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
+                <h3>Dada</h3>
                 <p style="margin-top: 1rem; line-height: 1.6;">Grande sœur curieuse qui adore découvrir le monde et partager ses aventures en chansons !</p>
             </div>
             <div class="character-card boubou">
-<div class="character-illustration"><img src="/images/Boubou.png" alt="Boubou" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>                <h3>Boubou</h3>
+                <div class="character-illustration"><img src="/images/Boubou.png" alt="Boubou" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
+                <h3>Boubou</h3>
                 <p style="margin-top: 1rem; line-height: 1.6;">Petit frère joyeux qui suit sa grande sœur partout et transforme chaque moment en mélodie rigolote !</p>
             </div>
         </div>
@@ -691,7 +700,7 @@
 
                 <div class="form-group">
                     <label>Langue de la chanson *</label>
-                    <select name="langue" required>
+                    <select name="langue" maxlength="20" required>
                         <option value="">-- Sélectionnez --</option>
                         <option value="français">Français</option>
                         <option value="anglais">Anglais</option>
@@ -709,17 +718,17 @@
 
                 <div class="form-group">
                     <label>Prénom(s) de l'enfant/des enfants destinataire(s) *</label>
-                    <input type="text" name="prenomEnfants" placeholder="Ex: Emma et Lucas" required>
+                    <input type="text" name="prenomEnfants" maxlength="50" placeholder="Ex: Emma et Lucas" required>
                 </div>
 
                 <div class="form-group">
                     <label>Âge(s)</label>
-                    <input type="text" name="ages" placeholder="Ex: 5 ans et 3 ans">
+                    <input type="text" name="ages" maxlength="20" placeholder="Ex: 5 ans et 3 ans">
                 </div>
 
                 <div class="form-group">
                     <label>Thème de la chanson *</label>
-                    <select name="theme" required>
+                    <select name="theme" maxlength="30" required>
                         <option value="">-- Sélectionnez --</option>
                         <option value="anniversaire">🎂 Anniversaire</option>
                         <option value="coucher">🌙 Berceuse/Coucher</option>
@@ -737,7 +746,7 @@
 
                 <div class="form-group">
                     <label>Style musical</label>
-                    <select name="style">
+                    <select name="style" maxlength="30">
                         <option value="">-- Sélectionnez (optionnel) --</option>
                         <option value="berceuse">🎵 Berceuse douce</option>
                         <option value="pop">🎤 Pop joyeux</option>
@@ -763,8 +772,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Anecdotes rigolotes ou moments spéciaux</label>
-                    <textarea name="anecdotes" placeholder="Partagez 2-3 anecdotes amusantes, expressions favorites, ou moments spéciaux que vous aimeriez voir dans la chanson..."></textarea>
+                    <label>Anecdotes rigolotes ou moments spéciaux (max 200 caractères)</label>
+                    <textarea name="anecdotes" id="anecdotes" maxlength="200" placeholder="Partagez 2-3 anecdotes amusantes, expressions favorites, ou moments spéciaux..." oninput="updateCharCount('anecdotes')"></textarea>
+                    <div class="char-counter" id="anecdotes-counter">0/200 caractères</div>
                 </div>
 
                 <div class="form-group">
@@ -783,12 +793,12 @@
 
                 <div class="form-group">
                     <label>Votre email *</label>
-                    <input type="email" name="email" placeholder="votre@email.com" required>
+                    <input type="email" name="email" maxlength="100" placeholder="votre@email.com" required>
                 </div>
 
                 <div class="form-group">
                     <label>Nom pour la facturation *</label>
-                    <input type="text" name="nom" placeholder="Prénom Nom" required>
+                    <input type="text" name="nom" maxlength="50" placeholder="Prénom Nom" required>
                 </div>
 
                 <div class="form-group" style="background: #fff9e6; padding: 20px; border-radius: 10px; border-left: 4px solid #f39c12; margin: 20px 0;">
@@ -848,14 +858,15 @@
 
     <footer id="contact">
         <p>© 2025 LABBE Kids - Tous droits réservés</p>
-<p style="margin-top: 1rem;">Contact : <a href="mailto:contact@bouboudada.com" style="color: white;">contact@bouboudada.com</a></p>        <p style="margin-top: 1rem;">
+        <p style="margin-top: 1rem;">Contact : <a href="mailto:contact@bouboudada.com" style="color: white;">contact@bouboudada.com</a></p>
+        <p style="margin-top: 1rem;">
             <a href="/cgv.html" style="color: white; text-decoration: underline; margin: 0 10px;">CGV</a> | 
             <a href="/cgv.html" style="color: white; text-decoration: underline; margin: 0 10px;">Mentions Légales</a>
         </p>
     </footer>
 
-    <!-- Netlify Identity Widget -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script>
         if (window.netlifyIdentity) {
             window.netlifyIdentity.on("init", user => {
@@ -871,6 +882,14 @@
     <script>
         let characterCount = 0;
         let currentOrderData = {};
+
+        function updateCharCount(fieldId) {
+            const field = document.getElementById(fieldId);
+            const counter = document.getElementById(fieldId + '-counter');
+            if (field && counter) {
+                counter.textContent = field.value.length + '/' + field.maxLength + ' caractères';
+            }
+        }
 
         function selectPlan(plan) {
             document.getElementById('plan').value = plan;
@@ -894,8 +913,8 @@
                         Supprimer
                     </button>
                 </div>
-                <input type="text" name="character${characterCount}Name" placeholder="Nom/Prénom" style="margin-bottom: 0.5rem;">
-                <input type="text" name="character${characterCount}Role" placeholder="Rôle (ex: grand-mère, chat, meilleur ami...)">
+                <input type="text" name="character${characterCount}Name" maxlength="30" placeholder="Nom/Prénom" style="margin-bottom: 0.5rem;">
+                <input type="text" name="character${characterCount}Role" maxlength="30" placeholder="Rôle (ex: grand-mère, chat, meilleur ami...)">
             `;
             container.appendChild(div);
         }
@@ -924,7 +943,6 @@
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Vérifier les CGV
             const cgvCheckbox = document.getElementById('accept_cgv');
             if (!cgvCheckbox.checked) {
                 alert('Vous devez accepter les Conditions Générales de Vente pour continuer.');
@@ -933,17 +951,16 @@
             }
             
             const formData = new FormData(this);
-currentOrderData = Object.fromEntries(formData);
+            currentOrderData = Object.fromEntries(formData);
 
-// Mapper les champs vers les noms attendus par le webhook
-currentOrderData.childName = currentOrderData.prenomEnfants || 'Non spécifié';
-currentOrderData.age = currentOrderData.ages || 'Non spécifié';
-currentOrderData.message = currentOrderData.anecdotes || 'Aucun';
-currentOrderData.occasion = currentOrderData.theme; // Le thème sert d'occasion
+            currentOrderData.childName = currentOrderData.prenomEnfants || 'Non spécifié';
+            currentOrderData.age = currentOrderData.ages || 'Non spécifié';
+            currentOrderData.message = currentOrderData.anecdotes || 'Aucun';
+            currentOrderData.occasion = currentOrderData.theme;
 
-currentOrderData.instrumental = document.getElementById('instrumental').checked;
-currentOrderData.secondLangue = document.getElementById('secondLangue').checked;
-currentOrderData.accept_cgv = true; // CGV acceptées
+            currentOrderData.instrumental = document.getElementById('instrumental').checked;
+            currentOrderData.secondLangue = document.getElementById('secondLangue').checked;
+            currentOrderData.accept_cgv = true;
             
             const { total, planName, options } = calculateTotal();
             currentOrderData.total = total;
@@ -992,3 +1009,5 @@ currentOrderData.accept_cgv = true; // CGV acceptées
             }
         }
     </script>
+</body>
+</html>
