@@ -33,14 +33,27 @@ exports.handler = async (event, context) => {
     try {
       console.log('🔔 Webhook reçu pour session:', session.id);
       
-      // Récupérer les données de commande depuis les métadonnées
-      const orderData = JSON.parse(session.metadata.orderData);
-      const orderId = session.id;
-      const paymentId = session.payment_intent;
+      // Récupérer la session complète avec line_items
+      const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+        expand: ['line_items']
+      });
+      
+      // Récupérer TOUTES les données depuis la description du produit
+      const description = fullSession.line_items?.data?.[0]?.description || '';
+      
+      // Infos de base depuis metadata
+      const customerEmail = fullSession.metadata.customerEmail || fullSession.customer_email;
+      const customerName = fullSession.metadata.customerName || 'Client';
+      const childName = fullSession.metadata.childName || 'Non spécifié';
+      const plan = fullSession.metadata.plan || 'Non spécifié';
+      
+      const orderId = fullSession.id;
+      const paymentId = fullSession.payment_intent;
+      const amount = (fullSession.amount_total / 100).toFixed(2);
 
-      console.log('📧 Préparation emails pour:', orderData.email);
+      console.log('📧 Préparation emails pour:', customerEmail);
 
-      // Construire le détail de la commande
+      // Construire le détail de la commande avec TOUTES les données
       const orderDetails = `
 🎵 NOUVELLE COMMANDE LABBE KIDS
 ═══════════════════════════════
@@ -49,35 +62,16 @@ exports.handler = async (event, context) => {
 - Numéro: ${orderId}
 - Date: ${new Date().toLocaleString('fr-FR')}
 - Paiement ID: ${paymentId}
-- Montant: ${(session.amount_total / 100).toFixed(2)}€
+- Montant: ${amount}€
 
-👤 Client:
-- Nom: ${orderData.nom}
-- Email: ${orderData.email}
-
-🎶 Détails de la chanson:
-- Formule: ${orderData.plan}
-- Enfant: ${orderData.childName || 'Non spécifié'}
-- Âge: ${orderData.age || 'Non spécifié'}
-- Thème: ${orderData.theme || 'Non spécifié'}
-- Occasion: ${orderData.occasion || 'Non spécifié'}
-- Langue: ${orderData.langue || 'Non spécifié'}
-- Style: ${orderData.style || 'Non spécifié'}
-${orderData.secondLangue ? '- 2ème langue: Oui' : ''}
-${orderData.instrumental ? '- Version instrumentale: Oui' : ''}
-
-📝 Message/Anecdotes:
-${orderData.anecdotes || orderData.message || 'Aucun'}
-
-👥 Personnages additionnels:
-${getCharactersList(orderData)}
+${description}
       `.trim();
 
       // EMAIL 1: Confirmation au CLIENT
       console.log('📧 Envoi email au client...');
       await transporter.sendMail({
         from: `"LABBE Kids" <${process.env.SMTP_USER}>`,
-        to: orderData.email,
+        to: customerEmail,
         subject: '🎉 Confirmation de votre commande LABBE Kids',
         html: `
           <!DOCTYPE html>
@@ -99,17 +93,14 @@ ${getCharactersList(orderData)}
                 <h1>🎵 Merci pour votre commande !</h1>
               </div>
               <div class="content">
-                <h2>Bonjour ${orderData.nom},</h2>
-                <p>Nous avons bien reçu votre commande et votre paiement de <strong>${(session.amount_total / 100).toFixed(2)}€</strong>.</p>
+                <h2>Bonjour ${customerName},</h2>
+                <p>Nous avons bien reçu votre commande et votre paiement de <strong>${amount}€</strong>.</p>
                 
                 <div class="order-box">
                   <h3>📋 Récapitulatif de votre commande</h3>
                   <p><strong>Numéro de commande:</strong> ${orderId}</p>
-                  <p><strong>Formule:</strong> ${getFormuleName(orderData.plan)}</p>
-                  <p><strong>Enfant:</strong> ${orderData.childName || 'Non spécifié'}</p>
-                  <p><strong>Thème:</strong> ${orderData.theme || 'Non spécifié'}</p>
-                  ${orderData.instrumental ? '<p>✅ Version instrumentale incluse</p>' : ''}
-                  ${orderData.secondLangue ? '<p>✅ 2ème langue incluse</p>' : ''}
+                  <p><strong>Formule:</strong> ${getFormuleName(plan)}</p>
+                  <p><strong>Enfant:</strong> ${childName}</p>
                 </div>
 
                 <h3>📅 Prochaines étapes</h3>
@@ -139,7 +130,7 @@ ${getCharactersList(orderData)}
       await transporter.sendMail({
         from: `"LABBE Kids System" <${process.env.SMTP_USER}>`,
         to: process.env.ADMIN_EMAIL || process.env.SMTP_USER,
-        subject: `🎵 NOUVELLE COMMANDE - ${orderData.childName} - ${(session.amount_total / 100).toFixed(2)}€`,
+        subject: `🎵 NOUVELLE COMMANDE - ${childName} - ${amount}€`,
         text: orderDetails,
         html: `
           <!DOCTYPE html>
@@ -160,9 +151,9 @@ ${getCharactersList(orderData)}
               </div>
               <pre>${orderDetails}</pre>
               <div class="info-block">
-                <p><strong>Action requise:</strong> Créer la chanson personnalisée pour ${orderData.childName}</p>
+                <p><strong>Action requise:</strong> Créer la chanson personnalisée pour ${childName}</p>
                 <p><strong>Délai:</strong> 2-3 jours ouvrables</p>
-                <p><strong>Envoyer à:</strong> ${orderData.email}</p>
+                <p><strong>Envoyer à:</strong> ${customerEmail}</p>
               </div>
             </div>
           </body>
@@ -191,19 +182,7 @@ ${getCharactersList(orderData)}
   return { statusCode: 200, body: 'OK' };
 };
 
-// Fonctions utilitaires
-function getCharactersList(orderData) {
-  const characters = [];
-  for (let i = 1; i <= 10; i++) {
-    const name = orderData[`character${i}Name`];
-    const role = orderData[`character${i}Role`];
-    if (name) {
-      characters.push(`- ${name}${role ? ` (${role})` : ''}`);
-    }
-  }
-  return characters.length > 0 ? characters.join('\n') : 'Aucun personnage additionnel';
-}
-
+// Fonction utilitaire
 function getFormuleName(plan) {
   const names = {
     'découverte': '🌟 Découverte (9.90€)',
