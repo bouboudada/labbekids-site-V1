@@ -22,7 +22,7 @@ exports.handler = async (event, context) => {
   try {
     stripeEvent = stripe.webhooks.constructEvent(event.body, sig, webhookSecret);
   } catch (err) {
-    console.error('Erreur webhook signature:', err.message);
+    console.error('Erreur webhook:', err.message);
     return { statusCode: 400, body: `Webhook Error: ${err.message}` };
   }
 
@@ -33,20 +33,10 @@ exports.handler = async (event, context) => {
     try {
       console.log('🔔 Webhook reçu pour session:', session.id);
       
-      // 🔥 IMPORTANT: Récupérer les données depuis les metadata (infos de base)
-      const orderData = {
-        email: session.metadata.customerEmail || session.customer_email,
-        nom: session.metadata.customerName || 'Client',
-        childName: session.metadata.childName || 'Non spécifié',
-        plan: session.metadata.plan || 'Non spécifié',
-        langue: session.metadata.langue || 'français',
-        theme: session.metadata.theme || 'Non spécifié',
-        age: session.metadata.age || 'Non spécifié'
-      };
-      
+      // Récupérer les données de commande depuis les métadonnées
+      const orderData = JSON.parse(session.metadata.orderData);
       const orderId = session.id;
       const paymentId = session.payment_intent;
-      const amount = (session.amount_total / 100).toFixed(2);
 
       console.log('📧 Préparation emails pour:', orderData.email);
 
@@ -59,7 +49,7 @@ exports.handler = async (event, context) => {
 - Numéro: ${orderId}
 - Date: ${new Date().toLocaleString('fr-FR')}
 - Paiement ID: ${paymentId}
-- Montant: ${amount}€
+- Montant: ${(session.amount_total / 100).toFixed(2)}€
 
 👤 Client:
 - Nom: ${orderData.nom}
@@ -67,10 +57,20 @@ exports.handler = async (event, context) => {
 
 🎶 Détails de la chanson:
 - Formule: ${orderData.plan}
-- Enfant: ${orderData.childName}
-- Âge: ${orderData.age}
-- Thème: ${orderData.theme}
-- Langue: ${orderData.langue}
+- Enfant: ${orderData.childName || 'Non spécifié'}
+- Âge: ${orderData.age || 'Non spécifié'}
+- Thème: ${orderData.theme || 'Non spécifié'}
+- Occasion: ${orderData.occasion || 'Non spécifié'}
+- Langue: ${orderData.langue || 'Non spécifié'}
+- Style: ${orderData.style || 'Non spécifié'}
+${orderData.secondLangue ? '- 2ème langue: Oui' : ''}
+${orderData.instrumental ? '- Version instrumentale: Oui' : ''}
+
+📝 Message/Anecdotes:
+${orderData.anecdotes || orderData.message || 'Aucun'}
+
+👥 Personnages additionnels:
+${getCharactersList(orderData)}
       `.trim();
 
       // EMAIL 1: Confirmation au CLIENT
@@ -100,15 +100,16 @@ exports.handler = async (event, context) => {
               </div>
               <div class="content">
                 <h2>Bonjour ${orderData.nom},</h2>
-                <p>Nous avons bien reçu votre commande et votre paiement de <strong>${amount}€</strong>.</p>
+                <p>Nous avons bien reçu votre commande et votre paiement de <strong>${(session.amount_total / 100).toFixed(2)}€</strong>.</p>
                 
                 <div class="order-box">
                   <h3>📋 Récapitulatif de votre commande</h3>
                   <p><strong>Numéro de commande:</strong> ${orderId}</p>
                   <p><strong>Formule:</strong> ${getFormuleName(orderData.plan)}</p>
-                  <p><strong>Enfant:</strong> ${orderData.childName}</p>
-                  <p><strong>Thème:</strong> ${orderData.theme}</p>
-                  <p><strong>Langue:</strong> ${orderData.langue}</p>
+                  <p><strong>Enfant:</strong> ${orderData.childName || 'Non spécifié'}</p>
+                  <p><strong>Thème:</strong> ${orderData.theme || 'Non spécifié'}</p>
+                  ${orderData.instrumental ? '<p>✅ Version instrumentale incluse</p>' : ''}
+                  ${orderData.secondLangue ? '<p>✅ 2ème langue incluse</p>' : ''}
                 </div>
 
                 <h3>📅 Prochaines étapes</h3>
@@ -138,7 +139,7 @@ exports.handler = async (event, context) => {
       await transporter.sendMail({
         from: `"LABBE Kids System" <${process.env.SMTP_USER}>`,
         to: process.env.ADMIN_EMAIL || process.env.SMTP_USER,
-        subject: `🎵 NOUVELLE COMMANDE - ${orderData.childName} - ${amount}€`,
+        subject: `🎵 NOUVELLE COMMANDE - ${orderData.childName} - ${(session.amount_total / 100).toFixed(2)}€`,
         text: orderDetails,
         html: `
           <!DOCTYPE html>
@@ -149,8 +150,7 @@ exports.handler = async (event, context) => {
               .container { background: white; padding: 30px; border-radius: 10px; max-width: 800px; margin: 0 auto; }
               .alert { background: #4CAF50; color: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
               .info-block { background: #f9f9f9; padding: 15px; margin: 10px 0; border-left: 4px solid #9b59b6; }
-              pre { background: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
-              .warning { background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0; }
+              pre { background: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; white-space: pre-wrap; }
             </style>
           </head>
           <body>
@@ -159,9 +159,6 @@ exports.handler = async (event, context) => {
                 <h2>🎉 NOUVELLE COMMANDE REÇUE</h2>
               </div>
               <pre>${orderDetails}</pre>
-              <div class="warning">
-                <p><strong>⚠️ Note:</strong> Pour voir TOUTES les données de la commande (anecdotes, personnages, message complet), consultez le dashboard Stripe : <a href="https://dashboard.stripe.com/payments/${paymentId}">Voir le paiement</a></p>
-              </div>
               <div class="info-block">
                 <p><strong>Action requise:</strong> Créer la chanson personnalisée pour ${orderData.childName}</p>
                 <p><strong>Délai:</strong> 2-3 jours ouvrables</p>
@@ -194,7 +191,19 @@ exports.handler = async (event, context) => {
   return { statusCode: 200, body: 'OK' };
 };
 
-// Fonction utilitaire
+// Fonctions utilitaires
+function getCharactersList(orderData) {
+  const characters = [];
+  for (let i = 1; i <= 10; i++) {
+    const name = orderData[`character${i}Name`];
+    const role = orderData[`character${i}Role`];
+    if (name) {
+      characters.push(`- ${name}${role ? ` (${role})` : ''}`);
+    }
+  }
+  return characters.length > 0 ? characters.join('\n') : 'Aucun personnage additionnel';
+}
+
 function getFormuleName(plan) {
   const names = {
     'découverte': '🌟 Découverte (9.90€)',
