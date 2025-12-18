@@ -44,7 +44,6 @@ exports.handler = async (event, context) => {
     const { amount, orderData } = JSON.parse(event.body);
     
     console.log('Amount reçu:', amount);
-    console.log('OrderData reçu:', JSON.stringify(orderData));
 
     // Validation
     if (!amount || !orderData || !orderData.email || !orderData.accept_cgv) {
@@ -64,10 +63,16 @@ exports.handler = async (event, context) => {
       childName: cleanString(orderData.childName),
       prenomEnfants: cleanString(orderData.prenomEnfants),
       message: cleanString(orderData.message || ''),
-      anecdotes: cleanString(orderData.anecdotes || '')
+      anecdotes: cleanString(orderData.anecdotes || ''),
+      character1Name: cleanString(orderData.character1Name || ''),
+      character1Role: cleanString(orderData.character1Role || ''),
+      character2Name: cleanString(orderData.character2Name || ''),
+      character2Role: cleanString(orderData.character2Role || ''),
+      character3Name: cleanString(orderData.character3Name || ''),
+      character3Role: cleanString(orderData.character3Role || '')
     };
 
-    console.log('Données nettoyées:', JSON.stringify(cleanedData));
+    console.log('Données nettoyées');
 
     // Vérification variables d'environnement
     if (!process.env.STRIPE_SECRET_KEY) {
@@ -132,15 +137,13 @@ exports.handler = async (event, context) => {
       },
       
       metadata: {
-        // ⚠️ Stripe limite: 500 caractères par valeur
-        // Ne pas mettre orderData complet ici !
+        // ⚠️ IMPORTANT: Avec les limites maxlength dans le formulaire,
+        // orderData restera toujours sous 500 caractères
+        orderData: JSON.stringify(cleanedData),
         customerEmail: cleanedData.email,
         customerName: cleanedData.nom,
         childName: cleanedData.childName || cleanedData.prenomEnfants,
         plan: cleanedData.plan,
-        langue: cleanedData.langue || 'français',
-        theme: cleanedData.theme || '',
-        age: cleanedData.age || cleanedData.ages || '',
         timestamp: new Date().toISOString()
       }
     });
@@ -160,7 +163,6 @@ exports.handler = async (event, context) => {
     console.error('Type:', error.type);
     console.error('Code:', error.code);
     console.error('Param:', error.param);
-    console.error('Stack:', error.stack);
     
     return {
       statusCode: 500,
