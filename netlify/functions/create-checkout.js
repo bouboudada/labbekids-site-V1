@@ -104,9 +104,36 @@ exports.handler = async (event, context) => {
             currency: 'eur',
             product_data: {
               name: `Chanson personnalisée - ${cleanedData.plan}`,
-              description: `Pour ${cleanedData.childName || cleanedData.prenomEnfants || 'l\'enfant'}`,
+              description: `Pour ${cleanedData.childName || cleanedData.prenomEnfants}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 DONNÉES COMPLÈTES DE LA COMMANDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 CLIENT:
+Nom: ${cleanedData.nom}
+Email: ${cleanedData.email}
+
+🎵 CHANSON:
+Enfant(s): ${cleanedData.childName || cleanedData.prenomEnfants}
+Age: ${cleanedData.age || cleanedData.ages || 'Non spécifié'}
+Plan: ${cleanedData.plan}
+Langue: ${cleanedData.langue}
+Thème: ${cleanedData.theme}
+Style: ${cleanedData.style || 'Non spécifié'}
+
+👥 PERSONNAGES:
+${getCharactersList(cleanedData)}
+
+📝 ANECDOTES/MESSAGE:
+${cleanedData.anecdotes || cleanedData.message || 'Aucun'}
+
+⚙️ OPTIONS:
+${cleanedData.instrumental ? '✓ Version instrumentale' : ''}
+${cleanedData.secondLangue ? '✓ 2ème langue' : ''}
+`.trim()
             },
-            unit_amount: Math.round(amount * 100), // en centimes
+            unit_amount: Math.round(amount * 100),
           },
           quantity: 1,
         },
@@ -137,9 +164,7 @@ exports.handler = async (event, context) => {
       },
       
       metadata: {
-        // ⚠️ IMPORTANT: Avec les limites maxlength dans le formulaire,
-        // orderData restera toujours sous 500 caractères
-        orderData: JSON.stringify(cleanedData),
+        // Seulement les infos essentielles (pas de limite ici car très court)
         customerEmail: cleanedData.email,
         customerName: cleanedData.nom,
         childName: cleanedData.childName || cleanedData.prenomEnfants,
@@ -174,3 +199,16 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// Fonction utilitaire pour formater la liste des personnages
+function getCharactersList(orderData) {
+  const characters = [];
+  for (let i = 1; i <= 10; i++) {
+    const name = orderData[`character${i}Name`];
+    const role = orderData[`character${i}Role`];
+    if (name) {
+      characters.push(`  - ${name}${role ? ` (${role})` : ''}`);
+    }
+  }
+  return characters.length > 0 ? characters.join('\n') : '  Aucun personnage additionnel';
+}
